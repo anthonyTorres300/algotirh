@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extended Euclidean Algorithm Visualizer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: linear-gradient(to right, #555, #777);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+        
+        .result-content {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 10px 0;
+            min-height: 40px;
+        }
+        
+        .equation {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1.3rem;
+        }
+        
+        .visualization {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: rgba(79, 172, 254, 0.5);
+            padding: 15px;
+            text-align: center;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .highlight {
+            background: rgba(0, 242, 254, 0.3);
+            transition: background 0.5s ease;
+        }
+        
+        .explanation {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid #4facfe;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .explanation h3 {
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Extended Euclidean Algorithm Visualizer</h1>
+            <p class="subtitle">Visualize how the Extended Euclidean Algorithm computes GCD and Bézout coefficients</p>
+        </header>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="number1">Enter First Number (a):</label>
+                <input type="number" id="number1" min="1" max="1000" value="240">
+            </div>
+            
+            <div class="input-group">
+                <label for="number2">Enter Second Number (b):</label>
+                <input type="number" id="number2" min="1" max="1000" value="46">
+            </div>
+            
+            <div class="button-group">
+                <button id="startBtn">Start Visualization</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+        </div>
+        
+        <div class="result-section">
+            <div class="result-title">Final Result</div>
+            <div id="finalResult" class="result-content">Enter numbers and click "Start Visualization"</div>
+            <div id="equation" class="equation"></div>
+        </div>
+        
+        <div class="explanation">
+            <h3>About the Extended Euclidean Algorithm</h3>
+            <p>The Extended Euclidean Algorithm computes the greatest common divisor (GCD) of two integers a and b, along with coefficients x and y such that:</p>
+            <p class="equation">a·x + b·y = gcd(a, b)</p>
+            <p>This relationship is known as Bézout's identity. The algorithm works by repeatedly applying the division algorithm and updating coefficients at each step.</p>
+        </div>
+        
+        <div class="visualization">
+            <h2>Algorithm Steps</h2>
+            <div class="table-container">
+                <table id="stepsTable">
+                    <thead>
+                        <tr>
+                            <th>Step</th>
+                            <th>a</th>
+                            <th>b</th>
+                            <th>q = a // b</th>
+                            <th>r = a % b</th>
+                            <th>x</th>
+                            <th>y</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stepsBody">
+                        <!-- Table rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="controls">
+                <div class="speed-control">
+                    <label for="speed">Speed:</label>
+                    <input type="range" id="speed" min="1" max="10" value="5">
+                </div>
+                <button id="prevBtn" disabled>Previous Step</button>
+                <button id="nextBtn" disabled>Next Step</button>
+                <button id="autoBtn">Auto Run</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created with JavaScript, HTML, and CSS | Extended Euclidean Algorithm Visualizer</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const number1Input = document.getElementById('number1');
+            const number2Input = document.getElementById('number2');
+            const startBtn = document.getElementById('startBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const autoBtn = document.getElementById('autoBtn');
+            const speedInput = document.getElementById('speed');
+            const stepsBody = document.getElementById('stepsBody');
+            const finalResult = document.getElementById('finalResult');
+            const equation = document.getElementById('equation');
+            
+            // Algorithm state
+            let steps = [];
+            let currentStep = -1;
+            let autoInterval = null;
+            let gcdResult = 0;
+            let x = 0;
+            let y = 0;
+            
+            // Event listeners
+            startBtn.addEventListener('click', startAlgorithm);
+            resetBtn.addEventListener('click', resetAll);
+            prevBtn.addEventListener('click', showPrevStep);
+            nextBtn.addEventListener('click', showNextStep);
+            autoBtn.addEventListener('click', toggleAutoRun);
+            speedInput.addEventListener('input', updateSpeed);
+            
+            // Extended Euclidean Algorithm implementation
+            function extendedEuclidean(a, b) {
+                let steps = [];
+                
+                // Initialize variables
+                let r0 = a, r1 = b;
+                let s0 = 1, s1 = 0;
+                let t0 = 0, t1 = 1;
+                
+                // Add initial state
+                steps.push({
+                    a: r0,
+                    b: r1,
+                    q: '',
+                    r: '',
+                    x: s0,
+                    y: t0,
+                    desc: `Initialization: a = ${a}, b = ${b}`
+                });
+                
+                let stepCount = 1;
+                
+                while (r1 !== 0) {
+                    // Compute quotient and remainder
+                    let q = Math.floor(r0 / r1);
+                    let r = r0 % r1;
+                    
+                    // Update coefficients
+                    let s = s0 - q * s1;
+                    let t = t0 - q * t1;
+                    
+                    // Add step to history
+                    steps.push({
+                        a: r0,
+                        b: r1,
+                        q: q,
+                        r: r,
+                        x: s0,
+                        y: t0,
+                        desc: `Step ${stepCount}: ${r0} = ${q} × ${r1} + ${r}`
+                    });
+                    
+                    // Shift values for next iteration
+                    r0 = r1;
+                    r1 = r;
+                    s0 = s1;
+                    s1 = s;
+                    t0 = t1;
+                    t1 = t;
+                    
+                    stepCount++;
+                }
+                
+                // Add final step
+                steps.push({
+                    a: r0,
+                    b: 0,
+                    q: '',
+                    r: '',
+                    x: s0,
+                    y: t0,
+                    desc: `GCD is ${r0}`
+                });
+                
+                return {
+                    gcd: r0,
+                    x: s0,
+                    y: t0,
+                    steps: steps
+                };
+            }
+            
+            // Start the algorithm
+            function startAlgorithm() {
+                const a = parseInt(number1Input.value);
+                const b = parseInt(number2Input.value);
+                
+                if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
+                    alert('Please enter valid positive integers');
+                    return;
+                }
+                
+                // Reset previous state
+                resetTable();
+                
+                // Compute steps
+                const result = extendedEuclidean(a, b);
+                gcdResult = result.gcd;
+                x = result.x;
+                y = result.y;
+                steps = result.steps;
+                currentStep = -1;
+                
+                // Update buttons
+                startBtn.disabled = true;
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+                autoBtn.disabled = false;
+                
+                // Show first step
+                showNextStep();
+                
+                // Update final result
+                finalResult.textContent = `GCD(${a}, ${b}) = ${gcdResult}`;
+                equation.textContent = `Bézout coefficients: ${a} × (${x}) + ${b} × (${y}) = ${gcdResult}`;
+            }
+            
+            // Reset everything
+            function resetAll() {
+                // Clear interval if running
+                if (autoInterval) {
+                    clearInterval(autoInterval);
+                    autoInterval = null;
+                    autoBtn.textContent = 'Auto Run';
+                }
+                
+                // Reset state
+                steps = [];
+                currentStep = -1;
+                
+                // Reset UI
+                resetTable();
+                startBtn.disabled = false;
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                autoBtn.disabled = true;
+                
+                // Reset result display
+                finalResult.textContent = 'Enter numbers and click "Start Visualization"';
+                equation.textContent = '';
+            }
+            
+            // Reset the table
+            function resetTable() {
+                stepsBody.innerHTML = '';
+            }
+            
+            // Show next step
+            function showNextStep() {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    renderStep();
+                }
+                
+                updateButtons();
+            }
+            
+            // Show previous step
+            function showPrevStep() {
+                if (currentStep > 0) {
+                    // Remove highlight from current row
+                    const currentRow = stepsBody.children[currentStep];
+                    if (currentRow) {
+                        currentRow.classList.remove('highlight');
+                    }
+                    
+                    currentStep--;
+                    renderStep();
+                }
+                
+                updateButtons();
+            }
+            
+            // Render the current step
+            function renderStep() {
+                const step = steps[currentStep];
+                
+                // Create a new row
+                const row = document.createElement('tr');
+                
+                // Add step number (skip initial step number)
+                const stepNumCell = document.createElement('td');
+                stepNumCell.textContent = currentStep === 0 ? 'Init' : currentStep;
+                row.appendChild(stepNumCell);
+                
+                // Add data cells
+                const cells = ['a', 'b', 'q', 'r', 'x', 'y'];
+                cells.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = step[cell] !== '' ? step[cell] : '-';
+                    row.appendChild(td);
+                });
+                
+                // Highlight the new row
+                row.classList.add('highlight');
+                
+                // Add to table
+                stepsBody.appendChild(row);
+                
+                // Scroll to the new row
+                row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            // Toggle auto run
+            function toggleAutoRun() {
+                if (autoInterval) {
+                    // Stop auto run
+                    clearInterval(autoInterval);
+                    autoInterval = null;
+                    autoBtn.textContent = 'Auto Run';
+                    updateButtons();
+                } else {
+                    // Start auto run
+                    const speed = 1100 - (speedInput.value * 100);
+                    autoInterval = setInterval(() => {
+                        if (currentStep < steps.length - 1) {
+                            showNextStep();
+                        } else {
+                            // Reached the end, stop auto run
+                            clearInterval(autoInterval);
+                            autoInterval = null;
+                            autoBtn.textContent = 'Auto Run';
+                            updateButtons();
+                        }
+                    }, speed);
+                    
+                    autoBtn.textContent = 'Stop Auto';
+                    prevBtn.disabled = true;
+                }
+            }
+            
+            // Update speed
+            function updateSpeed() {
+                if (autoInterval) {
+                    // Restart auto run with new speed
+                    clearInterval(autoInterval);
+                    autoInterval = null;
+                    toggleAutoRun();
+                }
+            }
+            
+            // Update button states
+            function updateButtons() {
+                prevBtn.disabled = currentStep <= 0;
+                nextBtn.disabled = currentStep >= steps.length - 1;
+                
+                if (currentStep >= steps.length - 1 && autoInterval) {
+                    // Reached the end, stop auto run
+                    clearInterval(autoInterval);
+                    autoInterval = null;
+                    autoBtn.textContent = 'Auto Run';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
